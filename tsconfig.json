@@ -1,44 +1,18 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    /* Módulo e Ambiente */
-    "target": "ES2023",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "target": "ES2022",
     "lib": [
       "ES2023"
     ],
-    /* Emissão de Arquivos (Build) */
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "sourceMap": true,
-    "removeComments": true,
-    /* Verificações Estritas (Segurança de Tipos) */
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    /* Qualidade de Código e Boas Práticas */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    /* Interoperabilidade e Compatibilidade */
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "module": "node16",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "verbatimModuleSyntax": false
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+    "strict": true,
+    "skipLibCheck": true
+  }
 }

@@ -42,10 +42,19 @@ class UserController {
     }
   }
 
-  show(request: Request, response: Response) {
-    return response
-      .status(200)
-      .json({ message: "User retrieved successfully" });
+  async show(request: Request, response: Response, next: NextFunction) {
+    const userID = request.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userID,
+      },
+    });
+    if (!user) {
+      return next(new AppError("User not found."));
+    }
+    const { password: _, ...userWithoutPassword } = user;
+    return response.status(200).json({ user: userWithoutPassword });
   }
 }
 

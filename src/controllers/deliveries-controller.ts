@@ -1,4 +1,5 @@
 import { prisma } from "@/database/prisma.js";
+import { AppError } from "@/util/AppError.js";
 import { Request, Response, NextFunction } from "express";
 import z, { includes } from "zod";
 
@@ -43,16 +44,30 @@ class DeliveriesController {
       delivery_id: z.uuid(),
     });
 
-    const { delivery_id } = paramsSchema.parse(request.params);
+    try {
+      const { delivery_id } = paramsSchema.parse(request.params);
 
-    const deliveryWithLogs = await prisma.delivery.findUnique({
-      where: { id: delivery_id },
-      include: {
-        deliveryLogs: true,
-      },
-    });
+      const deliveryWithLogs = await prisma.delivery.findUnique({
+        where: { id: delivery_id },
+        include: {
+          deliveryLogs: true,
+        },
+      });
 
-    return response.json(deliveryWithLogs);
+      if (!deliveryWithLogs) {
+        throw new AppError("Delivery not found.");
+      }
+      if (
+        request.user.role === "CUSTOMER" &&
+        request.user.id !== deliveryWithLogs.userId
+      ) {
+        throw new AppError("The user can only view their deliveries.");
+      }
+
+      return response.json(deliveryWithLogs);
+    } catch (error) {
+      return next(error);
+    }
   }
 }
 

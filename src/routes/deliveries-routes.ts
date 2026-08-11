@@ -28,7 +28,7 @@ deliveriesRoutes.patch(
 
 deliveriesRoutes.get(
   "/:delivery_id",
-  verifyUserAuthorization(["ADMIN", "DRIVER", "USER"]),
+  verifyUserAuthorization(["ADMIN", "DRIVER", "CUSTOMER"]),
   deliveriesController.show,
 );
 

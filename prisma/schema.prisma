@@ -28,14 +28,15 @@ enum DeliveryStatus {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  name       String
-  email      String     @unique
-  role       UserRole   @default(CUSTOMER)
-  password   String
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-  deliveries Delivery[]
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  role         UserRole      @default(CUSTOMER)
+  password     String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  deliveries   Delivery[]
+  deliveryLogs DeliveryLog[]
 
   @@map("users")
 }
@@ -63,7 +64,12 @@ model DeliveryLog {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  deliveries Delivery @relation(fields: [deliveryId], references: [id])
+  previousStatus DeliveryStatus?
+  newStatus      DeliveryStatus
+  changedById    String?
+
+  delivery  Delivery @relation(fields: [deliveryId], references: [id])
+  changedBy User?    @relation(fields: [changedById], references: [id])
 
   @@index([deliveryId], name: "idx_delivery_id")
   @@map("delivery_logs")

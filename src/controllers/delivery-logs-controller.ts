@@ -1,6 +1,7 @@
 import { prisma } from "@/database/prisma.js";
 import { DeliveryStatus } from "@/generated/prisma/enums.js";
 import { AppError } from "@/util/AppError.js";
+import { isValidStatusTransition } from "@/util/delivery-transitions.js";
 import { NextFunction, Request, Response } from "express";
 import z from "zod";
 
@@ -12,14 +13,17 @@ class DeliveryLogController {
       description: z.string(),
     });
 
+    const transitions: Record<DeliveryStatus, DeliveryStatus[]> = {
+      PENDING: ["IN_TRANSIT", "CANCELED"],
+      IN_TRANSIT: ["DELIVERED", "CANCELED"],
+      DELIVERED: [],
+      CANCELED: [],
+    };
+
     try {
       const { delivery_id, description, status } = bodySchema.parse(
         request.body,
       );
-
-      // if (!Object.values(DeliveryStatus).includes(status as DeliveryStatus)) {
-      //   throw new AppError("Status out of standard.");
-      // }
 
       const delivery = await prisma.delivery.findUnique({
         where: { id: delivery_id },
@@ -28,11 +32,17 @@ class DeliveryLogController {
       if (!delivery) {
         throw new AppError("Delivery not found.");
       }
+      const changedBy = request.user.id;
+      const previousStatus = delivery.status;
 
-      if (delivery.status == "CANCELED" || delivery.status == "DELIVERED") {
+      if (transitions[previousStatus].length === 0) {
         throw new AppError(
-          "Delivery is canceled or already delivered, cannot be changed.",
+          "Delivery is already in a final state and cannot be changed.",
         );
+      }
+
+      if (!isValidStatusTransition(previousStatus, status)) {
+        throw new AppError("This transition is not valid.");
       }
 
       const [, deliveryLog] = await prisma.$transaction([
@@ -48,6 +58,9 @@ class DeliveryLogController {
           data: {
             description,
             deliveryId: delivery_id,
+            changedById: changedBy,
+            newStatus: status,
+            previousStatus: previousStatus,
           },
         }),
       ]);

@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "API de entregas de encomendas.",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsup src !src/generated",
     "start": "node dist/server.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
@@ -35,6 +38,7 @@
     "prisma": "^7.9.1",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
+    "tsup": "^8.5.1",
     "tsx": "^4.23.5",
     "typescript": "^5.9.3"
   }

@@ -9,6 +9,7 @@
         "./src/*"
       ]
     },
+    "rootDir": "./src",
     "outDir": "./dist",
     "module": "node16",
     "esModuleInterop": true,

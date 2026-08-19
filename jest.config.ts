@@ -11,6 +11,7 @@ const config: Config = {
     "^(\\.{1,2}/.*)\\.js$": "$1",
     "^@/(.*)\\.js$": "<rootDir>/src/$1",
   },
+  testPathIgnorePatterns: ["/node_modules", "/dist"],
 };
 
 export default config;
